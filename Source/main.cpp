@@ -13,8 +13,23 @@
 
 void processInput(GLFWwindow*);
 void set_framebuffer_size_callback(GLFWwindow*, int, int);
+void mouse_callback(GLFWwindow*, double, double);
 
+//Window Setting
 const int WIDTH = 800, HEIGHT = 600;
+
+//Camera Settings
+glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
+
+
+float lastX = 400, lastY = 300;
+float yaw = -90.0f, pitch = 0.0f;
+bool firstMouse = true;
+
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
 
 int main()
 {
@@ -44,6 +59,7 @@ int main()
     //Setting the Current Window to the one we created
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window,set_framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
 
 
     //Loading GLAD and other OpenGL Libs 
@@ -187,8 +203,16 @@ int main()
 
     glEnable(GL_DEPTH_TEST);
 
+    //to disable mouse out of the window
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
     while(!glfwWindowShouldClose(window))
     {
+        
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+        
         processInput(window);
         glClearColor(0.4f, 0.3f, 0.6f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -202,7 +226,10 @@ int main()
         ourShader.use();
 
         glm::mat4 view, projection;
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        //view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+        view = glm::lookAt(cameraPos, cameraPos+cameraFront, cameraUp);
+
         projection = glm::perspective(glm::radians(45.0f), (float)WIDTH/(float)HEIGHT, 0.1f, 100.0f);
 
         int modelLoc, viewLoc, projectionLoc;
@@ -220,7 +247,7 @@ int main()
             glm::mat4 model;
             model = glm::translate(model,cubePositions[i]);
             float angle = 20.0f * (i+1);
-            model = glm::rotate(model, (float)glfwGetTime()+angle, glm::vec3(1.0f, 0.3f, 0.5f));
+            model = glm::rotate(model, (float)glfwGetTime()+angle, glm::vec3(0.5f, 0.5f, 0.0f));
             modelLoc = glGetUniformLocation(ourShader.ID, "model");
             glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
@@ -247,9 +274,45 @@ void processInput(GLFWwindow *window)
     {
         glfwSetWindowShouldClose(window, true);
     }
+    float cameraSpeed = 3.5f * deltaTime; // adjust accordingly
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        cameraPos += cameraSpeed * cameraFront;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        cameraPos -= cameraSpeed * cameraFront;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 }
 
 void set_framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
     glViewport(0, 0, width, height);
+}
+
+void mouse_callback(GLFWwindow *window, double xPos, double yPos)
+{
+    float xOffset = xPos - lastX;
+    float yOffset = lastY - yPos;
+    lastX = xPos;
+    lastY = yPos;
+
+    float sensitivity = 0.05f;
+    xOffset *= sensitivity;
+    yOffset *= sensitivity;
+
+    if(firstMouse) // this bool variable is initially set to true
+    {
+        lastX = xPos;
+        lastY = yPos;
+        firstMouse = false;
+    }
+
+    yaw += xOffset;
+    pitch += yOffset;
+    glm::vec3 front;
+    front.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
+    front.y = sin(glm::radians(pitch));
+    front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
+    cameraFront = glm::normalize(front);
 }
