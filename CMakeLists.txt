@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1.2)
-project(shader)
+project(Camera_Transformation)
 
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Source")
 set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Source/Resources/include")
