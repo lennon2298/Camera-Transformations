@@ -8,10 +8,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#elif __WIN32
+#elif _WIN32
 #include <glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.hpp>
 #endif
 
 #include "Resources/Headers/Shader_new.h"
@@ -134,7 +134,7 @@ int main()
 
     #ifdef __linux__
     Shader ourShader("../Source/Resources/Shaders/vertex.glsl","../Source/Resources/Shaders/frag.glsl");
-    #elif __WIN32
+    #elif _WIN32
     Shader ourShader("../../Source/Resources/Shaders/vertex.glsl","../../Source/Resources/Shaders/frag.glsl");
     #endif
     
@@ -174,7 +174,7 @@ int main()
     stbi_set_flip_vertically_on_load(true);
     #ifdef __linux__
     data = stbi_load("../Source/Resources/Textures/pepe_high.jpg", &width, &height, &nrChannels, 0);
-    #elif __WIN32
+    #elif _WIN32
     data = stbi_load("../../Source/Resources/Textures/pepe_high.jpg", &width, &height, &nrChannels, 0);
     #endif
     if(data)
@@ -201,7 +201,7 @@ int main()
 
     #ifdef __linux__
     data = stbi_load("../Source/Resources/Textures/emoji.png", &width, &height, &nrChannels, 0);
-    #elif __WIN32
+    #elif _WIN32
     data = stbi_load("../../Source/Resources/Textures/emoji.png", &width, &height, &nrChannels, 0);
     #endif
     if(data)
