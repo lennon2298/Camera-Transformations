@@ -4,9 +4,15 @@
 #include <iostream>
 #include <cmath>
 
+#ifdef __linux__
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#elif __WIN32
+#include <glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#endif
 
 #include "Resources/Headers/Shader_new.h"
 #include "Resources/Headers/stb_image.h"
@@ -126,8 +132,12 @@ int main()
         glm::vec3(-1.3f,  1.0f, -1.5f)  
     };
 
+    #ifdef __linux__
     Shader ourShader("../Source/Resources/Shaders/vertex.glsl","../Source/Resources/Shaders/frag.glsl");
-
+    #elif __WIN32
+    Shader ourShader("../../Source/Resources/Shaders/vertex.glsl","../../Source/Resources/Shaders/frag.glsl");
+    #endif
+    
     //Generating Buffers and Vertex Arrays to send data to our Shaders
     unsigned int VBO,VAO;
 
@@ -162,7 +172,11 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     stbi_set_flip_vertically_on_load(true);
+    #ifdef __linux__
     data = stbi_load("../Source/Resources/Textures/pepe_high.jpg", &width, &height, &nrChannels, 0);
+    #elif __WIN32
+    data = stbi_load("../../Source/Resources/Textures/pepe_high.jpg", &width, &height, &nrChannels, 0);
+    #endif
     if(data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -185,7 +199,11 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+    #ifdef __linux__
     data = stbi_load("../Source/Resources/Textures/emoji.png", &width, &height, &nrChannels, 0);
+    #elif __WIN32
+    data = stbi_load("../../Source/Resources/Textures/emoji.png", &width, &height, &nrChannels, 0);
+    #endif
     if(data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
